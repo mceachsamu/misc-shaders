@@ -1,0 +1,16 @@
+.vs/
+.vscode/
+Assembly-CSharp.csproj
+Assets/Materials.meta
+Assets/Materials/
+Assets/resources.meta
+Assets/resources/
+Assets/scripts/scripts/shaders/cross_hatching.shader
+Assets/scripts/scripts/shaders/cross_hatching.shader.meta
+Library/
+Logs/
+Packages/
+ProjectSettings/
+Temp/
+obj/
+sum water.sln
