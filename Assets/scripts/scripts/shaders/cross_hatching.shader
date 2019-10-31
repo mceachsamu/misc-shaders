@@ -3,6 +3,7 @@
     Properties
     {
         _MainTex ("Texture", 2D) = "white" {}
+		_MainTex2 ("Texture2", 2D) = "white" {}
 		col("Main Color", Color) = (0,0,0,0)
 		lightDir("light direction", Vector) = (0,0,0,0)
 		camDir("camera direction", Vector) = (1,1,1,1)
@@ -42,6 +43,7 @@
             };
 
             sampler2D _MainTex;
+			sampler2D _MainTex2;
 			float4 col;
             float4 _MainTex_ST;
 			uniform float4 lightDir;
@@ -102,30 +104,18 @@
 
             fixed4 frag (v2f i) : SV_Target
             { 
-				float distanceFromCam = sqrt((camPos - i.vertex).x + (camPos - i.vertex).y + (camPos - i.vertex).z);
+				//float distanceFromCam = sqrt((camPos - i.vertex).x + (camPos - i.vertex).y + (camPos - i.vertex).z);
+				//vector from camera to the vertex
 				float3 lightDA = camPos - i.vertex;
-				float distance = sqrt(pow(lightDA.x,2) + pow(lightDA.y,2));
-				float ab = sqrt((lightDA + camDir).x + (lightDA + camDir).y + (lightDA + camDir).z);
-				float3 H = (lightDA + camDir)/ab;
+				//length of previous vector
 				float cosTheta = clamp(dot(normalize(i.normal), normalize(lightDA)), 0, 1);
 				float3 E = normalize(camDir);
 				float3 R = reflect(normalize(-lightDA), normalize(i.normal));
 				float cosAlpha = clamp(dot(E, R), 0, 1);
-                // sample the texture
-				//float uvx = mod(1.0, i.uv.x);
-				//float uvy = mod(1.0, i.uv.y);
 				col = tex2D(_MainTex, i.vec.xy/i.vec.w);
-				//col = col * (cosTheta);
 				float shading = 1 * cosTheta;
-				//col.rgb = clampF(1.1f - cosTheta - cosAlpha * 2 + sin(i.vertex.x / 0.9 + tex2D(_MainTex, i.vec.xy / i.vec.w).x * 10), 0, 1);// +0.5f + cosAlpha * 2 + sin(i.vertex.y / 5 + tex2D(_MainTex, i.vec) * 0), 0.0, 1.0);
-
-				col.rgb = clampF(0.6f  +cosTheta + cosAlpha * 2 +sin(i.vertex.y ), 0, 1)*clampF((0.6f + cosTheta + cosAlpha * 2 + sin(i.vertex.x + tex2D(_MainTex, i.vec)*10)), 0, 1);
-				//col.r = getCuttoff(col.r);
-				//col.g = getCuttoff(col.g);
-				//col.b = getCuttoff(col.b);
-				//col.b = col.b*1.3;
-				//col.g = col.g*1.6;
-				//col.r = col.r*0.3;
+				col.rgb = clampF(0.6f + cosTheta + cosAlpha * 2 +sin(i.vertex.y+i.vertex.x), 0, 1)*
+				clampF((0.6f + cosTheta + cosAlpha * 2 + sin(i.vertex.x - i.vertex.y+ tex2D(_MainTex, i.vec)*10)), 0, 1);
 				col.a = 1;
                 // apply fog
                 UNITY_APPLY_FOG(i.fogCoord, col);
