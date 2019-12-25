@@ -48,18 +48,20 @@
                 o.uv = TRANSFORM_TEX(v.uv, _MainTex);
                 o.uv2 = TRANSFORM_TEX(v.uv, _SecondTex);
 
-                float4 col = tex2D(_MainTex, o.uv.xy);
-
-                o.uv.x = o.uv.x + col.rgb.x*100;
-                o.uv.y = o.uv.y + col.rgb.y*100;
+                
+                o.uv.x = o.uv.x;
+                o.uv.y = o.uv.y;
                 UNITY_TRANSFER_FOG(o,o.vertex);
                 return o;
             }
 
             fixed4 frag (v2f i) : SV_Target
             {
+                float4 col3 = tex2D(_SecondTex, i.uv2);
+                float col2 = (col3.rgb.g-0.7f)/20.0f+timer/1000;
+                float2 newUV = float2(i.uv.x + col2 ,i.uv.y + col2);
                 // sample the texture
-                fixed4 col = tex2D(_MainTex, i.uv);
+                fixed4 col = tex2D(_MainTex,newUV);
                 // apply fog
                 UNITY_APPLY_FOG(i.fogCoord, col);
                 return col;

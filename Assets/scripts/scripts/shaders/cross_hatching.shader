@@ -45,6 +45,7 @@
             sampler2D _MainTex;
 			sampler2D _MainTex2;
 			float4 col;
+			
             float4 _MainTex_ST;
 			uniform float4 lightDir;
 			uniform float4 camDir;
@@ -113,9 +114,25 @@
 				float3 R = reflect(normalize(-lightDA), normalize(i.normal));
 				float cosAlpha = clamp(dot(E, R), 0, 1);
 				col = tex2D(_MainTex, i.vec.xy/i.vec.w);
+				float4 col2 = tex2D(_MainTex2, i.uv	);
+				float rotationConst = col2.rgb.g;
+				if (rotationConst < 0.25f){
+					rotationConst = 0.0f;
+				}
+				if (rotationConst < 0.5f){
+					rotationConst = 0.15f;
+				}
+				if (rotationConst < 0.75f){
+					rotationConst = 0.66f;
+				}
+				if (rotationConst < 1.0f){
+					rotationConst = 0.88f;
+				}
+				float xLines = i.vertex.y*(1-rotationConst)+i.vertex.x*rotationConst;
+				float yLines = i.vertex.y*rotationConst+i.vertex.x*(1-rotationConst);
 				float shading = 1 * cosTheta;
-				col.rgb = clampF(0.6f + cosTheta + cosAlpha * 2 +sin(i.vertex.y+i.vertex.x), 0, 1)*
-				clampF((0.6f + cosTheta + cosAlpha * 2 + sin(i.vertex.x - i.vertex.y+ tex2D(_MainTex, i.vec)*10)), 0, 1);
+				col.rgb = clampF(0.6f + cosTheta + cosAlpha * 2 +sin(xLines+tex2D(_MainTex, i.vec)*10), 0, 1)*
+				clampF((0.6f + cosTheta + cosAlpha * 2 + sin(yLines + tex2D(_MainTex, i.vec)*10)), 0, 1);
 				col.a = 1;
                 // apply fog
                 UNITY_APPLY_FOG(i.fogCoord, col);
